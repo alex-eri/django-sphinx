@@ -25,7 +25,9 @@ class ConnectionHandler(object):
 
     def _connection(self):
         if hasattr(self._connections, 'sphinx_database_connection'):
-            return getattr(self._connections, 'sphinx_database_connection')
+            conn = getattr(self._connections, 'sphinx_database_connection')
+            conn.ping()
+            return conn
 
         conn = MySQLdb.connect(host=SEARCHD_SETTINGS['sphinx_host'], port=SEARCHD_SETTINGS['sphinx_port'], charset='utf8', use_unicode=False)
         setattr(self._connections, 'sphinx_database_connection', conn)
