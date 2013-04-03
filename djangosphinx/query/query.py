@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+
 __author__ = 'ego'
 
 import MySQLdb
@@ -26,8 +27,13 @@ class ConnectionHandler(object):
     def _connection(self):
         if hasattr(self._connections, 'sphinx_database_connection'):
             conn = getattr(self._connections, 'sphinx_database_connection')
-            conn.ping()
-            return conn
+            try:
+                conn.ping()
+            except MySQLdb.OperationalError:
+                conn.close()
+                delattr(self._connections, 'sphinx_database_connection')
+            else:
+                return conn
 
         conn = MySQLdb.connect(host=SEARCHD_SETTINGS['sphinx_host'], port=SEARCHD_SETTINGS['sphinx_port'], charset='utf8', use_unicode=False)
         setattr(self._connections, 'sphinx_database_connection', conn)
